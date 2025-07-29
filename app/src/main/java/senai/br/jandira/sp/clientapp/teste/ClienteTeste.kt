@@ -6,10 +6,11 @@ import senai.br.jandira.sp.clientapp.service.RetrofitFactory
 fun main () {
 
     val c1 = Cliente(
-        nome = "Pelé",
+        nome = "Pelézinho",
         email = "pele@santosfc.com.br"
     )
 
-    RetrofitFactory().
+    val retrofit = RetrofitFactory().getClienteService()
+    val cliente = retrofit.gravar((c1))
 
 }
