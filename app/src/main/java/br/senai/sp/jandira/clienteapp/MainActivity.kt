@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import br.senai.sp.jandira.clienteapp.screens.HomeScreens
+import br.senai.sp.jandira.clienteapp.screens.formCliente
 import br.senai.sp.jandira.clienteapp.ui.theme.ClienteAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +22,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             ClienteAppTheme {
                 ClienteAppTheme {
-                    HomeScreens()
+                    //HomeScreens()
+                    formCliente()
                 }
             }
         }

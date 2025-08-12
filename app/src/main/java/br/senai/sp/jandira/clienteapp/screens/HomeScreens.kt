@@ -82,7 +82,7 @@ fun HomeScreens(modifier: Modifier = Modifier){
                 )
             }
             LazyColumn {
-                items(10){
+                items(20){
                     ClienteCard()
                 }
             }
