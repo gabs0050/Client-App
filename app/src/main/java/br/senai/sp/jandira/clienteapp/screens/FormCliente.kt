@@ -1,10 +1,14 @@
 package br.senai.sp.jandira.clienteapp.screens
 
+import android.util.Patterns
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,8 +28,8 @@ import retrofit2.await
 
 @Composable
 fun formCliente(modifier: Modifier = Modifier) {
-    
-    //Variáveis de estado para utilizar o outlined
+
+    // Variáveis de estado para utilizar o outlined
     var nomeCliente by remember {
         mutableStateOf("")
     }
@@ -34,10 +38,20 @@ fun formCliente(modifier: Modifier = Modifier) {
         mutableStateOf("")
     }
 
+    // Variáveis de estado para validar a entrada do usuário
+    var isNomeError by remember { mutableStateOf(false) }
+    var isEmailError by remember { mutableStateOf(false) }
+
+    fun validar(): Boolean {
+        isNomeError = nomeCliente.length < 1
+        isEmailError = !Patterns.EMAIL_ADDRESS.matcher(emailCliente).matches()
+        return !isNomeError && !isEmailError
+    }
+
     // Criar uma instância do RetrofitFactory
     val clienteApi = RetrofitFactory().getClienteService()
 
-    Column (
+    Column(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
@@ -51,8 +65,16 @@ fun formCliente(modifier: Modifier = Modifier) {
                 Text(text = "Digite seu nome")
             },
             supportingText = {
-                Text(text = "Nome do cliente é obrigatório")
+                if (isNomeError) {
+                    Text(text = "Nome do cliente é obrigatório")
+                }
             },
+            trailingIcon = {
+                if (isNomeError){
+                    Icon(imageVector = Icons.Default.Info, contentDescription = "erro")
+                }
+            },
+            isError = isNomeError,
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
@@ -64,22 +86,33 @@ fun formCliente(modifier: Modifier = Modifier) {
                 Text(text = "Digite seu e-mail")
             },
             supportingText = {
-                Text(text = "Email do cliente é obrigatório")
+                if (isEmailError) {
+                    Text(text = "E-mail inválido")
+                }
             },
-            isError = true,
+            trailingIcon = {
+                if (isEmailError){
+                    Icon(imageVector = Icons.Default.Info, contentDescription = "erro")
+                }
+            },
+            isError = isEmailError,
             modifier = Modifier.fillMaxWidth()
         )
         Button(
             onClick = {
                 // Criar um cliente com os dados que o usuário digitou
-                val cliente = Cliente(
-                    nome = nomeCliente,
-                    email = emailCliente
-                )
-                // Requisição POST para a API
-                GlobalScope.launch(Dispatchers.IO) {
-                    val novoCliente = clienteApi.gravar(cliente).await()
-                    println(novoCliente)
+                if (validar()) {
+                    val cliente = Cliente(
+                        nome = nomeCliente,
+                        email = emailCliente
+                    )
+                    // Requisição POST para a API
+                    GlobalScope.launch(Dispatchers.IO) {
+                        val novoCliente = clienteApi.gravar(cliente).await()
+                        println(novoCliente)
+                    }
+                } else {
+                    println("****** Os dados estão incorretos")
                 }
             },
             modifier = Modifier
@@ -93,6 +126,6 @@ fun formCliente(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-private fun FormClientePreview(){
+private fun FormClientePreview() {
     formCliente()
 }
