@@ -50,6 +50,9 @@ fun formCliente(modifier: Modifier = Modifier) {
             label = {
                 Text(text = "Digite seu nome")
             },
+            supportingText = {
+                Text(text = "Nome do cliente é obrigatório")
+            },
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
@@ -60,6 +63,10 @@ fun formCliente(modifier: Modifier = Modifier) {
             label = {
                 Text(text = "Digite seu e-mail")
             },
+            supportingText = {
+                Text(text = "Email do cliente é obrigatório")
+            },
+            isError = true,
             modifier = Modifier.fillMaxWidth()
         )
         Button(

@@ -22,8 +22,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             ClienteAppTheme {
                 ClienteAppTheme {
-                    //HomeScreens()
-                    formCliente()
+                    HomeScreens()
+                    //formCliente()
                 }
             }
         }
