@@ -58,6 +58,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.senai.sp.jandira.clienteapp.R
 import br.senai.sp.jandira.clienteapp.model.Cliente
+import br.senai.sp.jandira.clienteapp.service.ClienteService
 import br.senai.sp.jandira.clienteapp.service.RetrofitFactory
 import br.senai.sp.jandira.clienteapp.ui.theme.ClienteAppTheme
 import kotlinx.coroutines.Dispatchers
@@ -110,38 +111,30 @@ fun FormCliente() {
 }
 
 @Composable
-fun ClienteCard(cliente: Cliente, onDelete: (Cliente) -> Unit){
+fun ClienteCard(
+    cliente: Cliente,
+    onDelete: (Cliente) -> Unit
+){
+    var mostrarConfirmacao by remember { mutableStateOf(false) }
 
-    var mostrarConfirmaçãoExclusao by remember {
-        mutableStateOf(false)
-    }
-
-    //Mostrar Confirmação de exclusão
-    if (mostrarConfirmaçãoExclusao){
+    if (mostrarConfirmacao){
         AlertDialog(
-            onDismissRequest = {
-                mostrarConfirmaçãoExclusao = false
-            },
-            title = {
-                Text(text = "Excluir")
-            },
-            text = {
-                Text(text = "Confirma a exclusão do cliente ${cliente.nome}?")
-            },
+            onDismissRequest = { mostrarConfirmacao = false },
+            title = { Text("Confirmação") },
+            text = { Text("Deseja realmente excluir ${cliente.nome}?") },
             confirmButton = {
-                Button( // Use Button em vez de TextButton para melhor visual
-                    onClick = {
-                        onDelete(cliente) // << CORRIGIDO: Chama a lambda de exclusão
-                        mostrarConfirmaçãoExclusao = false
-                    }
-                ) {
-                    Text("Confirmar")
+                Button(onClick = {
+                    mostrarConfirmacao = false
+                    onDelete(cliente)
+                }) {
+                    Text("Sim")
                 }
-            },
+            }
+,
             dismissButton = {
                 Button(
                     onClick = {
-                        mostrarConfirmaçãoExclusao = false
+                        mostrarConfirmacao = false
                     }
                 ) {
                     Text("Cancelar")
@@ -183,7 +176,7 @@ fun ClienteCard(cliente: Cliente, onDelete: (Cliente) -> Unit){
             }
             IconButton(
                 onClick = {
-                    mostrarConfirmaçãoExclusao = true
+                    mostrarConfirmacao = true
                 }
             ) {
                 Icon(
