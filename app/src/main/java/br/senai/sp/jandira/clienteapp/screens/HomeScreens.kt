@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +35,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,46 +44,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import br.senai.sp.jandira.clienteapp.R
 import br.senai.sp.jandira.clienteapp.model.Cliente
 import br.senai.sp.jandira.clienteapp.service.RetrofitFactory
 import br.senai.sp.jandira.clienteapp.ui.theme.ClienteAppTheme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import retrofit2.await
 
 @Composable
 fun HomeScreens(modifier: Modifier = Modifier){
-
-    // Criar uma instância do retrofit factory
-    val clienteApi = RetrofitFactory().getClienteService()
-
-    // Criar uma variável de estado para armazenar a lista de clientes da API.
-    var clientes by remember {
-        mutableStateOf(listOf<Cliente>())
-    }
-
-    LaunchedEffect(Dispatchers.IO) {
-        clientes = clienteApi.exibirTodos().await()
-        println(clientes)
-    }
+    val navController = rememberNavController()
 
     Scaffold(
         topBar = {
             BarraDeTiTulo()
         },
         bottomBar = {
-            BarraDeNavegacao()
+            BarraDeNavegacao(navController)
         },
         floatingActionButton = {
-            BotaoFlutuante()
+            BotaoFlutuante(navController)
         }
     ) { paddingValues ->
         Column(
@@ -92,26 +79,8 @@ fun HomeScreens(modifier: Modifier = Modifier){
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
-            Row (
-                modifier = Modifier
-                    .padding(16.dp)
-            )
-            {
-                Icon(
-                    imageVector = Icons.Default.AccountBox,
-                    contentDescription = "Ícone da lista de clientes",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Lista de clientes"
-                )
-            }
-            LazyColumn {
-                items(clientes){ cliente ->
-                    ClienteCard(cliente)
-                }
-            }
+            // Chama a função que exibe o conteúdo da tela principal
+            TelHome(paddingValues)
         }
     }
 }
@@ -150,6 +119,41 @@ fun ClienteCard(cliente: Cliente){
                 imageVector = Icons.Default.Delete,
                 contentDescription = ""
             )
+        }
+    }
+}
+
+@Composable
+fun TelHome(paddingValues: PaddingValues){
+    val clienteApi = RetrofitFactory().getClienteService()
+
+    var clientes by remember {
+        mutableStateOf(listOf<Cliente>())
+    }
+
+    LaunchedEffect(Dispatchers.IO) {
+        clientes = clienteApi.exibirTodos().await()
+        println(clientes)
+    }
+    Column(modifier = Modifier.fillMaxSize()) {
+        Row (
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.AccountBox,
+                contentDescription = "Ícone da lista de clientes",
+                tint = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Lista de clientes"
+            )
+        }
+        LazyColumn {
+            items(clientes){ cliente ->
+                ClienteCard(cliente)
+            }
         }
     }
 }
@@ -219,7 +223,7 @@ private fun BarraDeTiTuloPreview() {
 }
 
 @Composable
-fun BarraDeNavegacao(modifier: Modifier = Modifier) {
+fun BarraDeNavegacao(navController: NavController, modifier: Modifier = Modifier) {
     NavigationBar(
         containerColor = MaterialTheme
             .colorScheme.primary
@@ -285,12 +289,12 @@ fun BarraDeNavegacao(modifier: Modifier = Modifier) {
 @Composable
 private fun BarraDeNavegacaoPreview(){
     ClienteAppTheme {
-        BarraDeNavegacao()
+        BarraDeNavegacao(rememberNavController())
     }
 }
 
 @Composable
-fun BotaoFlutuante(modifier: Modifier = Modifier) {
+fun BotaoFlutuante(navController: NavController) {
     FloatingActionButton(
         onClick = {},
         containerColor = MaterialTheme
@@ -308,7 +312,7 @@ fun BotaoFlutuante(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun BotaoFlutuantePreview(){
-
+    BotaoFlutuante(rememberNavController())
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
