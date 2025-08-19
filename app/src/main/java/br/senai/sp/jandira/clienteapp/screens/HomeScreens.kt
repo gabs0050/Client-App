@@ -84,9 +84,9 @@ fun HomeScreens(modifier: Modifier = Modifier){
             NavHost(
                 navController = navController,
                 startDestination = "home"
-            ){
-                composable(route = "home") { TelHome(paddingValues)}
-                composable(route = "Form") { FormCliente()}
+            ) {
+                composable(route = "home") { TelHome(paddingValues) }
+                composable(route = "formCliente") { formCliente() }
             }
         }
     }
@@ -285,7 +285,7 @@ fun BarraDeNavegacao(navController: NavController, modifier: Modifier = Modifier
         )
         NavigationBarItem(
             selected = false,
-            onClick = { /* TODO: Implement navigation to menu */ },
+            onClick = { navController!!.navigate("Home")},
             icon = {
                 Icon(
                     imageVector = Icons.Default.Menu,
@@ -315,17 +315,16 @@ private fun BarraDeNavegacaoPreview(){
 @Composable
 fun BotaoFlutuante(navController: NavController) {
     FloatingActionButton(
-        onClick = { navController.navigate("Form") },
-        containerColor = MaterialTheme
-            .colorScheme.tertiary
+        onClick = { navController.navigate("formCliente") },
+        containerColor = MaterialTheme.colorScheme.tertiary
     ) {
         Icon(
             imageVector = Icons.Default.Add,
             contentDescription = "Botão Adicionar",
-            tint = MaterialTheme
-                .colorScheme.onTertiary
+            tint = MaterialTheme.colorScheme.onTertiary
         )
     }
+
 }
 
 @Preview
