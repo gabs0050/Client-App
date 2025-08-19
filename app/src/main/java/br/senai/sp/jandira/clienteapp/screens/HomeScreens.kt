@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,7 +37,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -61,6 +61,8 @@ import br.senai.sp.jandira.clienteapp.model.Cliente
 import br.senai.sp.jandira.clienteapp.service.RetrofitFactory
 import br.senai.sp.jandira.clienteapp.ui.theme.ClienteAppTheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import retrofit2.await
 
 @Composable
@@ -108,11 +110,11 @@ fun FormCliente() {
 }
 
 @Composable
-fun ClienteCard(cliente: Cliente){
+fun ClienteCard(cliente: Cliente, onDelete: (Cliente) -> Unit){
 
-var mostrarConfirmaçãoExclusao by remember {
-    mutableStateOf(false)
-}
+    var mostrarConfirmaçãoExclusao by remember {
+        mutableStateOf(false)
+    }
 
     //Mostrar Confirmação de exclusão
     if (mostrarConfirmaçãoExclusao){
@@ -127,14 +129,17 @@ var mostrarConfirmaçãoExclusao by remember {
                 Text(text = "Confirma a exclusão do cliente ${cliente.nome}?")
             },
             confirmButton = {
-                TextButton(
-                    onClick = {}
+                Button( // Use Button em vez de TextButton para melhor visual
+                    onClick = {
+                        onDelete(cliente) // << CORRIGIDO: Chama a lambda de exclusão
+                        mostrarConfirmaçãoExclusao = false
+                    }
                 ) {
                     Text("Confirmar")
                 }
             },
             dismissButton = {
-                TextButton(
+                Button(
                     onClick = {
                         mostrarConfirmaçãoExclusao = false
                     }
@@ -161,16 +166,19 @@ var mostrarConfirmaçãoExclusao by remember {
     ) {
         Row (
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 Text(text = cliente.nome,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(text = cliente.email,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             IconButton(
@@ -180,7 +188,8 @@ var mostrarConfirmaçãoExclusao by remember {
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Excluir"
+                    contentDescription = "Excluir",
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -190,15 +199,39 @@ var mostrarConfirmaçãoExclusao by remember {
 @Composable
 fun TelHome(paddingValues: PaddingValues){
     val clienteApi = RetrofitFactory().getClienteService()
+    var clientes by remember { mutableStateOf(listOf<Cliente>()) }
+    var isLoading by remember { mutableStateOf(true) }
 
-    var clientes by remember {
-        mutableStateOf(listOf<Cliente>())
+
+    fun fetchClientes() {
+        isLoading = true
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val fetchedClientes = clienteApi.exibirTodos().await()
+                clientes = fetchedClientes
+            } catch (e: Exception) {
+                println("Erro ao buscar clientes: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
     }
 
-    LaunchedEffect(Dispatchers.IO) {
-        clientes = clienteApi.exibirTodos().await()
-        println(clientes)
+    fun deleteCliente(cliente: Cliente) {
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                clienteApi.exculir(cliente.id).await() // << CORRIGIDO: Passa o ID para a função de exclusão
+                fetchClientes() // Recarrega a lista após a exclusão
+            } catch (e: Exception) {
+                println("Erro ao excluir cliente: ${e.message}")
+            }
+        }
     }
+
+    LaunchedEffect(Unit) {
+        fetchClientes()
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Row (
             modifier = Modifier
@@ -216,7 +249,7 @@ fun TelHome(paddingValues: PaddingValues){
         }
         LazyColumn {
             items(clientes){ cliente ->
-                ClienteCard(cliente)
+                ClienteCard(cliente = cliente, onDelete = { deleteCliente(it) }) // << CORRIGIDO: Passa a função de exclusão
             }
         }
     }
@@ -226,7 +259,7 @@ fun TelHome(paddingValues: PaddingValues){
 @Composable
 private fun ClienteCardPreview(){
     ClienteAppTheme {
-        ClienteCard(Cliente())
+        ClienteCard(Cliente(), {})
     }
 
 }
