@@ -50,6 +50,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.senai.sp.jandira.clienteapp.R
 import br.senai.sp.jandira.clienteapp.model.Cliente
@@ -79,9 +81,26 @@ fun HomeScreens(modifier: Modifier = Modifier){
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
-            // Chama a função que exibe o conteúdo da tela principal
-            TelHome(paddingValues)
+            NavHost(
+                navController = navController,
+                startDestination = "home"
+            ){
+                composable(route = "home") { TelHome(paddingValues)}
+                composable(route = "Form") { FormCliente()}
+            }
         }
+    }
+}
+
+// Uma função de "stub" para a tela de formulário para evitar erros de compilação.
+@Composable
+fun FormCliente() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Tela de Cadastro de Clientes")
     }
 }
 
@@ -230,7 +249,7 @@ fun BarraDeNavegacao(navController: NavController, modifier: Modifier = Modifier
     ) {
         NavigationBarItem(
             selected = false,
-            onClick = {},
+            onClick = { navController.navigate("home") },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Home,
@@ -248,7 +267,7 @@ fun BarraDeNavegacao(navController: NavController, modifier: Modifier = Modifier
         )
         NavigationBarItem(
             selected = false,
-            onClick = {},
+            onClick = { /* TODO: Implement navigation to favorites */ },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Favorite,
@@ -266,7 +285,7 @@ fun BarraDeNavegacao(navController: NavController, modifier: Modifier = Modifier
         )
         NavigationBarItem(
             selected = false,
-            onClick = {},
+            onClick = { /* TODO: Implement navigation to menu */ },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Menu,
@@ -296,7 +315,7 @@ private fun BarraDeNavegacaoPreview(){
 @Composable
 fun BotaoFlutuante(navController: NavController) {
     FloatingActionButton(
-        onClick = {},
+        onClick = { navController.navigate("Form") },
         containerColor = MaterialTheme
             .colorScheme.tertiary
     ) {
