@@ -1,6 +1,5 @@
 package br.senai.sp.jandira.clienteapp.screens
 
-import android.content.ClipData.Item
 import android.util.Patterns
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import br.senai.sp.jandira.clienteapp.model.Cliente
 import br.senai.sp.jandira.clienteapp.service.RetrofitFactory
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 import retrofit2.await
 
 @Composable
-fun formCliente(modifier: Modifier = Modifier) {
+fun formCliente(navController: NavHostController?) {
 
     // Variáveis de estado para utilizar o outlined
     var nomeCliente by remember {
@@ -56,7 +56,7 @@ fun formCliente(modifier: Modifier = Modifier) {
     }
 
     // Variavel que vai exibir a caixa de diálogo
-    val mostrarTelaSucesso by remember {
+    var mostrarTelaSucesso by remember {
         mutableStateOf(false)
     }
 
@@ -132,7 +132,7 @@ fun formCliente(modifier: Modifier = Modifier) {
                     // Requisição POST para a API
                     GlobalScope.launch(Dispatchers.IO) {
                         val novoCliente = clienteApi.gravar(cliente).await()
-                        println(novoCliente)
+                        mostrarTelaSucesso = true
                     }
                 } else {
                     println("****** Os dados estão incorretos")
@@ -151,7 +151,9 @@ fun formCliente(modifier: Modifier = Modifier) {
                 text = { Text(text = "Cliente gravado com sucesso!") },
                 confirmButton = {
                     Button(
-                        onClick = {}
+                        onClick = {
+                            navController!!.navigate("Home")
+                        }
                     ) {
                         Text(text = "OK")
                     }
@@ -164,5 +166,5 @@ fun formCliente(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun FormClientePreview() {
-    formCliente()
+    formCliente(null)
 }

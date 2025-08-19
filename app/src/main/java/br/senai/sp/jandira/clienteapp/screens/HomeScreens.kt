@@ -29,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -86,7 +87,7 @@ fun HomeScreens(modifier: Modifier = Modifier){
                 startDestination = "home"
             ) {
                 composable(route = "home") { TelHome(paddingValues) }
-                composable(route = "formCliente") { formCliente() }
+                composable(route = "formCliente") { formCliente(navController) }
             }
         }
     }
@@ -134,10 +135,14 @@ fun ClienteCard(cliente: Cliente){
                     fontSize = 12.sp
                 )
             }
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = ""
-            )
+            IconButton(
+                onClick = {}
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Excluir"
+                )
+            }
         }
     }
 }
