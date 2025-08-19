@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +36,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -107,6 +109,42 @@ fun FormCliente() {
 
 @Composable
 fun ClienteCard(cliente: Cliente){
+
+var mostrarConfirmaçãoExclusao by remember {
+    mutableStateOf(false)
+}
+
+    //Mostrar Confirmação de exclusão
+    if (mostrarConfirmaçãoExclusao){
+        AlertDialog(
+            onDismissRequest = {
+                mostrarConfirmaçãoExclusao = false
+            },
+            title = {
+                Text(text = "Excluir")
+            },
+            text = {
+                Text(text = "Confirma a exclusão do cliente ${cliente.nome}?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {}
+                ) {
+                    Text("Confirmar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        mostrarConfirmaçãoExclusao = false
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -136,7 +174,9 @@ fun ClienteCard(cliente: Cliente){
                 )
             }
             IconButton(
-                onClick = {}
+                onClick = {
+                    mostrarConfirmaçãoExclusao = true
+                }
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
